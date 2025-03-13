@@ -46,3 +46,41 @@ res.status(200).json({
 
 
 
+export const login = async(req , res)=>{
+
+    try {
+    const {name , number , password} = req.body
+    
+    const newuser =await User.findOne({number})
+
+    if(!newuser){
+        return res.status(404).json({ error: "User not found" });
+    }
+
+    const isMatch = await bcrypt.compare(password, newuser.password);
+    if (!isMatch) {
+      return res.status(401).json({ error: "Invalid credentials" });
+    }
+    
+    const token = generateTokenAndSetCookie(newuser._id, res )
+    
+    res.status(200).json({
+        _id: newuser._id,
+        fullname: newuser.name,  
+        username: newuser.adresse,  
+        profilePic: newuser.profilePic || null,  
+        token: token,
+    })
+    
+    }
+    catch(error){
+        console.log("Error in login controller", error.message);
+        res.status(500).json({error: "error"}) 
+    }
+    
+    
+    
+    }
+    
+
+
