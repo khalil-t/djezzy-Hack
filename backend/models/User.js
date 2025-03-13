@@ -6,7 +6,6 @@ const userSchema = new mongoose.Schema(
     adresse: { type: String, required: true }, 
     number: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    skills: [{ type: String }], 
     myEvents: [{ type: mongoose.Schema.Types.ObjectId, ref: "Event" }], 
   },
   { timestamps: true }
