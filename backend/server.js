@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import connectDB from "./db/connectToMongoDB.js";
 import router from "./routes/auth.routes.js";
+import PostRoutes from "./routes/Post.routes.js";
 
 dotenv.config();
 connectDB();
@@ -13,6 +14,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/', router);
+app.use('/', PostRoutes);
 
 
 app.get("/", (req, res) => {
