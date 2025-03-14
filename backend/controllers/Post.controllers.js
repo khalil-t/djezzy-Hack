@@ -216,3 +216,21 @@ catch (error) {
 
 }
 
+export const filterPosts  = async (req, res)=>{
+try{
+    const { region, category } = req.query;
+
+    let filter = {};
+    if (region) filter.region = region;
+    if (category) filter.category = category;
+
+    const posts = await Post.find(filter)
+
+    res.status(200).json(posts)
+}
+catch (error) {
+    console.error("Error fetching filtered posts:", error.message);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+
+}
