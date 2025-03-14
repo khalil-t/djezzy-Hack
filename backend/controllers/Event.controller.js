@@ -154,7 +154,7 @@ try{
       if (!req.user) {
         return res.status(401).json({ success: false, message: "Unauthorized. Please log in." });
       }
-      
+
 
     if (event.user.toString() !== req.user.id) {
         return res.status(403).json({ success: false, message: "Access denied. You are not the event organizer." });
@@ -170,5 +170,65 @@ catch (error) {
     res.status(500).json({ error: "Internal Server Error" });
 }
 
+}
+
+export const joinEvent = async(req, res)=>{
+try{
+const {id} =req.params
+const userId = req.user.id;
+
+
+const event = await Event.findById(id);
+if (!event) {
+  return res.status(404).json({ success: false, message: "Event not found" });
+}
+
+
+if (event.attendees && event.attendees.includes(userId)) {
+    return res.status(400).json({ success: false, message: "You are already registered for this event" });
+  }
+
+    event.attendees = event.attendees || []; 
+    event.attendees.push(userId);
+
+await event.save(); 
+
+res.status(200).json({ success: true, message: "Successfully registered for the event", event });
+
+}
+catch (error) {
+    console.error("error:", error.message);
+    res.status(500).json({ error: "Internal Server Error" });
+}
+
+
+}
+
+export const SearchEvent= async(req , res)=>{
+try {
+const {q}= req.query
+
+if(!q){
+    return res.status(400).json({ success: false, message: "Please provide a search keyword." });
+}
+
+const regex = new RegExp(q, "i");
+
+const events = await Event.find({
+  $or: [{ name: regex }, { description: regex }],
+});
+
+if(events.length === 0){
+
+return res.status(404).json({success: false , message: "No matching events found." })
+}
+
+res.status(200).json({ success: true, events });
+
+}
+    catch (error) {
+        console.error("error:", error.message);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
 }
 

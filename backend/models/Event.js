@@ -12,6 +12,7 @@ const eventSchema = new mongoose.Schema(
     endDate: { type: Date, required: true },
     duration: { type: String }, 
     collaborators: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], 
+    attendees: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     requirements: [
       {
         type: { type: String, enum: ["Person", "Food", "Material"], required: true },
