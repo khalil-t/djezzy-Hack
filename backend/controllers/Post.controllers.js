@@ -190,3 +190,29 @@ catch (error) {
 }
 
 
+export const SearchPosts = async(req, res)=>{
+try {
+
+    const { q } = req.query;
+
+    if (!q) {
+        return res.status(400).json({ error: "Search query is required" });
+      }
+
+      const posts = await Post.find({
+        $or: [
+          { title: { $regex: q, $options: "i" } },  // Search in title
+          { content: { $regex: q, $options: "i" } }, // Search in content
+        ],
+      });
+  
+      res.status(200).json(posts);
+
+}
+catch (error) {
+    console.error("Error:", error.message);
+    res.status(500).json({ error: "Internal Server Error" });
+}
+
+}
+
