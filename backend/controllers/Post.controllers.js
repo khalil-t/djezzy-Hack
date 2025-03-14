@@ -148,6 +148,45 @@ catch (error) {
 
 }
 
+export const addComment  =async(req, res)=>{
+try{
+const { id } = req.params;
+const {content} =req.body
+const userId = req.user._id;
 
+if(!content){
+ return res.status(400).json({ error: "Comment content is required" });
+}
+
+const post = await Post.findById(id)
+
+if(!post){
+    return res.status(404).json({ error: "post not found" });
+}
+
+const newComment = await Comment.create({
+    user: userId,
+    post: id,
+    content
+})
+
+
+post.comments.push(newComment._id)
+await post.save();
+
+res.status(201).json({
+    message: "Comment added successfully",
+    comment: newComment
+  });
+
+}
+catch (error) {
+    console.error("Error:", error.message);
+    res.status(500).json({ error: "Internal Server Error" });
+}
+
+
+
+}
 
 
