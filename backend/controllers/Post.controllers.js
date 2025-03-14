@@ -60,6 +60,58 @@ export const GetAllPosts = async (req, res) => {
     }
 };
 
+export const GetPost= async (req, res)=>{
+try{
+const {id} = req.params
+
+if(!id){
+    return res.status(400).json({ error: "Post ID is required" });
+}
+
+const Post = await Post.findById(id)
+
+if (!Post) {
+    return res.status(404).json({ error: "Post not found" });
+}
+
+res.status(200).json(Post);
+
+}
+catch (error) {
+    console.error("Error fetching posts:", error.message);
+    res.status(500).json({ error: "Internal Server Error" });
+}
+
+
+}
+
+export const DeletePost = async(req, res)=>{
+
+try {
+const {id} =req.params
+if (!id) {
+    return res.status(400).json({ error: "Post ID is required" });
+}
+const post = await Post.findById(id)
+
+if(!post){
+return res.status(404).json({ error: "Post not found" });
+}
+
+if (!post.user || post.user.toString() !== req.user._id.toString()) {
+    return res.status(403).json({ error: "Unauthorized: You do not own this post" });
+}
+await Post.findByIdAndDelete(id);
+
+res.status(200).json({ message: "Post deleted successfully" });
+
+}
+catch (error) {
+    console.error("Error fetching posts:", error.message);
+    res.status(500).json({ error: "Internal Server Error" });
+}
+
+}
 
 
 
