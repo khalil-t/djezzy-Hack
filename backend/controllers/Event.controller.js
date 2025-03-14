@@ -1,3 +1,4 @@
+import Event from "../models/Event.js";
 import Event from "../models/Event.js"
 
 
@@ -60,7 +61,6 @@ catch (error) {
 
 }
 
-
 export const GetAllEvents = async(req, res)=>{
 
 try{
@@ -95,4 +95,80 @@ catch (error) {
 
 }
 
+export const GetSingleEvent= async(req, res)=>{
+try{
+    const {id} = req.params
+    if (!id) {
+        return res.status(400).json({ error: "Event ID is required" });
+      }
+
+    const FindEvent = await Event.findById(id)
+
+    if(!FindEvent){
+        return res.status(404).json({ error: "Event not found" });
+    }
+
+    res.status(200).json(FindEvent)
+
+}
+catch (error) {
+    console.error("error:", error.message);
+    res.status(500).json({ error: "Internal Server Error" });
+}
+
+}
+
+export const UpdateEvent = async(req,res)=>{
+
+ try{
+    const {id} = req.params
+    const event = await Event.findById(id);
+
+    if(!event){
+        return res.status(404).json({ success: false, message: "Event not found" });
+    }
+
+    if (event.user.toString() !== req.user.id) {
+        return res.status(403).json({ success: false, message: "Access denied. You are not the event organizer." });
+      }
+
+      const updatedEvent = await Event.findByIdAndUpdate(id, req.body, { new: true });
+
+      res.status(200).json({ success: true, event: updatedEvent });
+ }   
+ catch (error) {
+    console.error("error:", error.message);
+    res.status(500).json({ error: "Internal Server Error" });
+}
+}
+
+export const DeleteEvent= async(req, res)=>{
+try{
+    const {id} = req.params
+    const event = await Event.findById(id);
+
+    if (!event) {
+        return res.status(404).json({ success: false, message: "Event not found" });
+      }
+
+      if (!req.user) {
+        return res.status(401).json({ success: false, message: "Unauthorized. Please log in." });
+      }
+      
+
+    if (event.user.toString() !== req.user.id) {
+        return res.status(403).json({ success: false, message: "Access denied. You are not the event organizer." });
+      }
+
+      const deleteEvent = await Event.findByIdAndDelete(id)
+
+      res.status(200).json({ success: true, message: "Event deleted successfully" });
+
+}
+catch (error) {
+    console.error("error:", error.message);
+    res.status(500).json({ error: "Internal Server Error" });
+}
+
+}
 
