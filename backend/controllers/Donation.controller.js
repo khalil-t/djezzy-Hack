@@ -52,4 +52,33 @@ res.status(200).json({
       }    
 }
 
+export const selectEventForDonation = async(req, res)=>{
+try{
+const {donationId}= req.params
+const {eventId}= req.body
+
+
+const donation = await Donation.findById(donationId);
+if (!donation) {
+  return res.status(404).json({ success: false, message: "Donation not found." });
+}
+
+
+const event = await Event.findById(eventId)
+if(!event){
+    return res.status(404).json({ success: false, message: "Event not found." });
+}
+
+
+donation.event = eventId;
+await donation.save();
+
+res.status(200).json({ success: true, message: "Event selected for donation.", donation });
+
+}
+    catch (error) {
+        console.error("Error:", error.message);
+        res.status(500).json({ error: "Internal Server Error" });
+      }
+}
 
